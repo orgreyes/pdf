@@ -16,7 +16,11 @@ $router->setBaseURL('/' . $_ENV['APP_NAME']);
 $router->get('/', [AppController::class,'index']);
 $router->get('/pdf', [ReporteController::class,'pdf']);
 
+//!Rutas Para Ventas
 $router->get('/ventas', [VentaController::class,'index']);
+$router->get('/API/ventas/buscar', [VentaController::class,'buscarAPI']);
+$router->post('/API/ventas/guardar', [VentaController::class,'guardarAPI']);
+$router->post('/API/ventas/eliminar', [VentaController::class,'eliminarAPI']);
 
 //!Rutas Para Productos
 $router->get('/productos', [ProductoController::class,'index']);
