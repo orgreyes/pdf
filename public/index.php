@@ -15,6 +15,7 @@ $router->setBaseURL('/' . $_ENV['APP_NAME']);
 
 $router->get('/', [AppController::class,'index']);
 $router->get('/pdf', [ReporteController::class,'pdf']);
+$router->post('/reporte/generarPDF', [ReporteController::class, 'generarPDF']);
 
 //!Rutas Para Ventas
 $router->get('/ventas', [VentaController::class,'index']);

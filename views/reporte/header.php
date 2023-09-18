@@ -1,1 +1,4 @@
-<p>header de PDF</p>
+
+<header>
+    <h1>COMANDO DE INFORMATICA Y TECNOLOGIA</h1>
+</header>

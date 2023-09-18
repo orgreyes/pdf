@@ -1,150 +1,44 @@
 <?php
 
 namespace Controllers;
-use Exception;
-use Model\Venta;
-use Model\Cliente;
+
+use Mpdf\Mpdf;
 use MVC\Router;
+use Model\Venta;
+use Exception;
 
-class VentaController{
-    public static function index(Router $router){
-
-
-        $ventas = Venta::all();
-        
-        
-
-        $router->render('ventas/index', [
-            'ventas' => $ventas,
-            'clientes' => $clientes,
-        ]); 
-    }
-
-    //!--------------------------
-public static function buscarClientes(){
-    $sql = "SELECT * FROM clientes where cliente_situacion = 1";
-
-    try {
-        $clientes = Cliente::fetchArray($sql);
-
-        if($clientes){
-            return $clientes;
-        }else{
-            return 0;
-        }
-    } catch (Exception $e) {
-        
-    }
-}
-
-    
-//!Funcion Guardar
-public static function guardarAPI(){
-    try {
-        $venta = new Venta($_POST);
-        $resultado = $venta->crear();
-        if($resultado['resultado'] == 1){
-            echo json_encode([
-                'mensaje' => 'Registro guardado correctamente',
-                'codigo' => 1
-            ]);
-        }else{
-            echo json_encode([
-                'mensaje' => 'Ocurrio un error',
-                'codigo' => 0
-            ]);
-        }
-        // echo json_encode($resultado);
-    } catch (Exception $e) {
-        echo json_encode([
-            'detalle' => $e->getMessage(),
-            'mensaje'=> 'Ocurrio un Error',
-            'codigo' => 0
-    ]);
-    }
-}
-
-// //!Funcion Modificar
-//     public static function modificarAPI(){
-//         try{
-//             $clinica = new Clinica($_POST);
-//             $resultado = $clinica->actualizar();
-//             // echo json_encode($clinica);
-//             // exit;
-
-//             if($resultado['resultado'] == 1){
-//                 echo json_encode([
-//                     'mensaje' => 'Registro guardado correctamente',
-//                     'codigo' => 1
-//                 ]);
-//             }else{
-//                 echo json_encode([
-//                     'mensaje' => 'Ocurrio un error',
-//                     'codigo' => 0
-//                 ]);
-//             }
-//         }catch(Exception $e){
-//             echo json_encode([
-//                 'detalle' => $e->getMessage(),
-//                 'mensaje'=> 'Ocurrio un Error',
-//                 'codigo' => 0
-//         ]);
-//         }
-//     }
-
-//!Funcion Eliminar
-public static function eliminarAPI(){
-    try{
-        $venta_id = $_POST['venta_id'];
-        $venta = Venta::find($venta_id);
-        $venta->venta_situacion = 0;
-        $resultado = $venta->actualizar();
-
-        if($resultado['resultado'] == 1){
-            echo json_encode([
-                'mensaje' => 'Registro guardado correctamente',
-                'codigo' => 1
-            ]);
-        }else{
-            echo json_encode([
-                'mensaje' => 'Ocurrio un error',
-                'codigo' => 0
-            ]);
-        }
-    }catch(Exception $e){
-        echo json_encode([
-            'detalle' => $e->getMessage(),
-            'mensaje'=> 'Ocurrio un Error',
-            'codigo' => 0
-    ]);
-    }
-}
-
-
-//!Funcion Buscar
-public static function buscarAPI(){
-    $venta_cliente = $_GET['venta_cliente'];
-
-
-    $sql = "SELECT * FROM ventas WHERE venta_situacion = 1 ";
-    if($venta_cliente != ''){
-        $sql .= "AND venta_cliente LIKE '%$venta_cliente%' ";
+class VentaController
+{
+    public static function index(Router $router)
+    {
+        $router->render('ventas/index', []);
     }
 
 
-    try {
-        $ventas = Venta::fetchArray($sql);
-        echo json_encode($ventas);
-        
-    } catch (exception $e) {
+    public static function buscarAPI()
+    {
+        $venta_fecha_inicio = $_GET['venta_fecha_inicio'];
+        $venta_fecha_fin = $_GET['venta_fecha_fin'];
+        $fechaInicioFormateada = date('Y-m-d H:i', strtotime($venta_fecha_inicio));
+        $fechaFinFormateada = date('Y-m-d H:i', strtotime($venta_fecha_fin));
+        $sql = "SELECT v.venta_fecha AS fecha, dv.detalle_cantidad AS cantidad, p.producto_nombre AS producto, c.cliente_nombre AS cliente
+        FROM ventas v
+            INNER JOIN detalle_ventas dv ON v.venta_id = dv.detalle_venta
+            INNER JOIN productos p ON dv.detalle_producto = p.producto_id
+            INNER JOIN clientes c ON v.venta_cliente = c.cliente_id
+        WHERE
+            v.venta_fecha BETWEEN '{$fechaInicioFormateada}' AND '{$fechaFinFormateada}'";
+
+        try {
+            $ventas = Venta::fetchArray($sql);
+            echo json_encode($ventas);
+        } catch (Exception $e) {
             echo json_encode([
                 'detalle' => $e->getMessage(),
-                'mensaje'=> 'Ocurrio un Error',
+                'mensaje' => 'Ocurrió un error',
                 'codigo' => 0
-        ]);
+            ]);
+        }
     }
-
-}
-
-
-}
+    
+ }    
